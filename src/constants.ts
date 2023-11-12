@@ -1,6 +1,5 @@
 export const rhythmKey: [string, number][] = [
   ['16', 0.0625],
-  ['16.', 0.09375],
   ['8', 0.125],
   ['8.', 0.1875],
   ['q', 0.25],
@@ -8,15 +7,16 @@ export const rhythmKey: [string, number][] = [
   ['h', 0.5],
 ];
 
-export const timeSignatures: string[] = [
-  '2/4', '3/4', '4/4', '5/4', '6/4', '7/4', '11/4',
-  '2/8', '3/8', '5/8', '6/8', '7/8', '9/8', '10/8', '11/8', '12/8', '13/8',
-  '13/16',
-];
+export const timeSignatureKey: {[key:string]: number[]} = {
+  4: [2,3,4,5,6,7,11],
+  8: [2,3,5,6,7,9,10,11,12,13],
+  16: [13]
+};
 
 export const timeSignatureSplit: {[key:string]: number[]} = {
-  2: [1,1],
-  3: [1,1,1],
+  1: [1],
+  2: [2],
+  3: [3],
   4: [2,2],
   5: [2,3],
   6: [3,3],
