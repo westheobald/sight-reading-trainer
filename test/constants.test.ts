@@ -1,4 +1,4 @@
-import { rhythmKey } from "../src/constants";
+import { rhythmKey, timeSignatures, timeSignatureSplit } from "../src/constants";
 
 describe('Rhythm Testing', function rhythmConstantTests() {
   test('rhythmKey Correct Values', function rhythmKeyValuesTest() {
@@ -16,4 +16,20 @@ describe('Rhythm Testing', function rhythmConstantTests() {
       }
     }
   })
+});
+
+describe('Time Signature Testing', function timeSignatureTests() {
+  test('timeSignatures Valid', function validTimeSignatureTest() {
+    for (const signature of timeSignatures) {
+      const reg = /\d{1,2}\/\d{1,2}/ ;
+      expect(reg.test(signature)).toBeTruthy();
+    }
+  });
+  test('Time Signature Splits', function timeSignatureSplitTest() {
+    for (const signature of timeSignatures) {
+      let numerator = Number(signature.match(/\d{1,2}(?=\/)/));
+      if (!numerator) throw Error('Time Signature Numerator not found');
+      expect(timeSignatureSplit[numerator].reduce((acc, curr) => acc + curr)).toBe(+numerator);
+    }
+  });
 });
