@@ -1,0 +1,17 @@
+{
+  "name": "sight-reading-trainer",
+  "version": "1.0.0",
+  "description": "Music practice tool for improving sight reading",
+  "main": "",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Wes Theobald",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.8",
+    "ts-jest": "^29.1.1"
+  }
+}
