@@ -1,10 +1,17 @@
-export const rhythmKey: [string, number][] = [
-  ['16', 0.0625],
-  ['8', 0.125],
-  ['8.', 0.1875],
-  ['q', 0.25],
-  ['q.', 0.375],
-  ['h', 0.5],
+export type rhythmKey = {
+  string: string,
+  number: number,
+  value: number,
+  dotted: boolean,
+}
+export const rhythmKey: rhythmKey[] = [
+  { string: '16', number: 16, value: 0.0625, dotted: false },
+  { string: '8', number: 8, value: 0.125, dotted: false },
+  { string: '8.', number: 8, value: 0.1875, dotted: true },
+  { string: 'q', number: 4, value: 0.25, dotted: false },
+  { string: 'q.', number: 4, value: 0.375, dotted: true },
+  { string: 'h', number: 2, value: 0.5, dotted: false },
+  { string: 'h.', number: 2, value: 0.75, dotted: true },
 ];
 
 export const timeSignatureKey: {[key:string]: number[]} = {
