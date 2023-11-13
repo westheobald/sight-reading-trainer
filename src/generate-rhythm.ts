@@ -10,7 +10,7 @@ export function generateRhythms(numBars: number, timeSignature: [number, number]
 }
 
 export function generateOneBar([numerator, denominator]: [number, number]): rhythmKey[] {
-  const baseRhythmValue = rhythmKey.find((rhythmObj) => denominator == rhythmObj.number)?.value;
+  const baseRhythmValue = rhythmKey.find(rhythmObj => denominator == rhythmObj.number)?.value;
   const split = timeSignatureSplit[numerator];
   if (!split || !baseRhythmValue) throw Error('Time signature not valid.');
   let remaining = baseRhythmValue * numerator;
