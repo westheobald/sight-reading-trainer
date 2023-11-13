@@ -38,12 +38,38 @@ export const timeSignatureSplit: { [key: string]: number[] } = {
 type scalesKey = {
   numericFormula: string[];
   intervallicFormula: number[];
-  minInterval: number;
+  maxInterval: number;
 };
 export const scalesKey: { [key: string]: scalesKey } = {
   major: {
     numericFormula: ['1', '2', '3', '4', '5', '6', '7'],
     intervallicFormula: [0, 2, 2, 1, 2, 2, 2, 1],
-    minInterval: 2,
+    maxInterval: 2,
+  },
+  majorPentatonic: {
+    numericFormula: ['1', '2', '3', '5', '6'],
+    intervallicFormula: [0, 2, 2, 3, 2, 3],
+    maxInterval: 3,
   },
 };
+
+export const possibleNotes = new Set([
+  'a',
+  'a#',
+  'bb',
+  'b',
+  'cb',
+  'c',
+  'c#',
+  'db',
+  'd',
+  'd#',
+  'eb',
+  'e',
+  'f',
+  'f#',
+  'gb',
+  'g',
+  'g#',
+  'ab',
+]);
