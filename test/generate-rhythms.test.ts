@@ -1,4 +1,4 @@
-import { generateRhythms } from "../src/generate-rhythm";
+import { generateRhythms } from '../src/generate-rhythm';
 import { timeSignatureKey, rhythmKey } from '../src/constants';
 
 describe('Generate Rhythms Testing', () => {
@@ -9,7 +9,9 @@ describe('Generate Rhythms Testing', () => {
         for (const numerator of timeSignatureKey[denominatorKey]) {
           const rhythms = generateRhythms(numBars, [numerator, denominator]);
           let total = 0;
-          const baseRhythmValue = rhythmKey.find(rhythm => !rhythm.dotted && rhythm.number == denominator)?.value;
+          const baseRhythmValue = rhythmKey.find((rhythm) => {
+            return !rhythm.dotted && rhythm.number == denominator;
+          })?.value;
           if (!baseRhythmValue) throw Error('Invalid rhythm');
 
           for (const bar of rhythms) {

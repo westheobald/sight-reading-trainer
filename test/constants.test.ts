@@ -1,4 +1,4 @@
-import { rhythmKey, timeSignatureKey, timeSignatureSplit } from "../src/constants";
+import { rhythmKey, timeSignatureKey, timeSignatureSplit } from '../src/constants';
 
 describe('Rhythm Testing', function rhythmConstantTests() {
   test('rhythmKey Correct Values', function rhythmKeyValuesTest() {
@@ -9,7 +9,7 @@ describe('Rhythm Testing', function rhythmConstantTests() {
         expect(rhythm.value).toBe(1 / rhythm.number + 1 / (rhythm.number * 2));
       }
     }
-  })
+  });
 });
 
 describe('Time Signature Testing', function timeSignatureTests() {
