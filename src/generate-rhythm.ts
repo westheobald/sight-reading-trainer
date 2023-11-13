@@ -1,5 +1,5 @@
-import { timeSignatureSplit, rhythmKey } from "./constants";
-import { getRandomIndex } from "./helpers";
+import { timeSignatureSplit, rhythmKey } from './constants';
+import { getRandomIndex } from './helpers';
 
 export function generateRhythms(numBars: number, timeSignature: [number, number]): rhythmKey[][] {
   const rhythms = [];
