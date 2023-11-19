@@ -1,5 +1,5 @@
 import {
-    MAX_INTERVAL,
+  MAX_INTERVAL,
   MAX_RANGE,
   MAX_TEMPO,
   MIN_RANGE,
@@ -66,12 +66,15 @@ export class Music {
     const notes = new Array(NOTES.length);
     notes[noteIndex] = rootNote;
 
-    let previousNumber = +scale.numericFormula[0];
+    let previousNumber = 1;
     for (let i = 1; i < scale.numericFormula.length; i++) {
       const numStr = scale.numericFormula[i].at(-1);
       if (numStr == undefined) throw Error('Invalid scale formula');
       const num = +numStr;
-      if (num != previousNumber) alphabetIndex = (alphabetIndex + (num - previousNumber)) % 7;
+      if (num > previousNumber) {
+        alphabetIndex = (alphabetIndex + (num - previousNumber)) % 7;
+        previousNumber = num;
+      }
       noteIndex = (noteIndex + scale.intervallicFormula[i]) % NOTES.length;
       notes[noteIndex] = NOTES[noteIndex].find((note) => note[0] == musicAlphabet[alphabetIndex]);
     }
@@ -85,20 +88,20 @@ export class Music {
   }
   static validateTimeSignature(timeSignature: [number, number]): [number, number] {
     const [numerator, denominator] = timeSignature;
-    if (!TIME_SIGNATURES[denominator] || !TIME_SIG_SPLITS[numerator]) {
+    if (!TIME_SIGNATURES[denominator] || !TIME_SIGNATURES[denominator].includes(numerator)) {
       throw Error('Invalid time signature');
     }
     return timeSignature;
   }
   static validateRange(range: [number, number]): [number, number] {
-    const [minRange, maxRange] = range
-    if (minRange < MIN_RANGE || maxRange > MAX_RANGE) {
+    const [minRange, maxRange] = range;
+    if (minRange < MIN_RANGE || maxRange > MAX_RANGE || maxRange - minRange < 12) {
       throw Error('Invalid range');
     }
-    return range; 
+    return range;
   }
   static validateIntervalSize(intervalSize: number, scale: scale): number {
-    if (intervalSize < scale.maxInterval || intervalSize > MAX_INTERVAL) {
+    if (intervalSize < 2 || intervalSize < scale.maxInterval || intervalSize > MAX_INTERVAL) {
       throw Error('Invalid interval size');
     }
     return intervalSize;
