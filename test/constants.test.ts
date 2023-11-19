@@ -1,4 +1,15 @@
-import { RHYTHMS, TIME_SIGNATURES, TIME_SIG_SPLITS } from '../src/constants';
+import {
+  MAX_INTERVAL,
+  MAX_RANGE,
+  MAX_TEMPO,
+  MIN_RANGE,
+  MIN_TEMPO,
+  RHYTHMS,
+  ROOT_NOTES,
+  SCALES,
+  TIME_SIGNATURES,
+  TIME_SIG_SPLITS,
+} from '../src/constants';
 
 describe('Rhythm Testing', function rhythmConstantTests() {
   test('RHYTHMS Correct Values', function rhythmKeyValuesTest() {
@@ -28,6 +39,57 @@ describe('Time Signature Testing', function timeSignatureTests() {
       for (const numerator of numeratorArr) {
         expect(TIME_SIG_SPLITS[numerator].reduce((acc, curr) => acc + curr)).toBe(numerator);
       }
+    }
+  });
+});
+
+describe('Scale Testing', function scaleTests() {
+  test('Numeric Formula', function validNumericFormulas() {
+    for (const scaleKey in SCALES) {
+      let previousNum = 0;
+      for (const el of SCALES[scaleKey].numericFormula) {
+        const match = el.match(/^[#b]?(\d)$/);
+        if (match == null) throw Error('Invalid Formula');
+        const num = +match[1];
+        expect(num).toBeGreaterThanOrEqual(previousNum);
+        previousNum = num;
+      }
+    }
+  });
+  test('Intervallic Formula', function validIntervallicFormula() {
+    for (const scaleKey in SCALES) {
+      const total = SCALES[scaleKey].intervallicFormula.reduce((acc, curr) => acc + curr);
+      expect(total).toBe(12);
+    }
+  });
+  test('Max Interval', function validMaxInterval() {
+    for (const scaleKey in SCALES) {
+      const max = SCALES[scaleKey].intervallicFormula.reduce((acc, curr) =>
+        curr > acc ? curr : acc,
+      );
+      expect(max).toBe(SCALES[scaleKey].maxInterval);
+    }
+  });
+});
+
+describe('Root Notes and Key Signatures', function keySignatureTests() {
+  test('Key Signature', function validKeySignatureAccidentals() {
+    const circleOfFifths = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#'];
+    const circleOfFourths = ['c', 'f', 'bb', 'eb', 'ab', 'db', 'gb', 'cb'];
+    for (let i = 0; i < circleOfFifths.length; i++) {
+      expect(i).toBe(ROOT_NOTES[circleOfFifths[i]]);
+      expect(i - 2 * i).toBe(ROOT_NOTES[circleOfFourths[i]]);
+    }
+    expect(Object.keys(ROOT_NOTES).length).toBe(circleOfFifths.length + circleOfFourths.length - 1);
+  });
+});
+
+describe('Max/Min Constants', function maxMinConstantTests() {
+  test('Ensure Integers', function maxMinIntergers() {
+    const tests = [MAX_RANGE, MIN_RANGE, MAX_TEMPO, MIN_TEMPO, MAX_INTERVAL];
+    for (const num of tests) {
+      expect(Number.isInteger(num)).toBeTruthy();
+      expect(num).toBeGreaterThan(0);
     }
   });
 });

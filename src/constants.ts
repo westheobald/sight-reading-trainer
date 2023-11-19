@@ -73,7 +73,7 @@ export const ROOT_NOTES: { [key: string]: number } = {
   'gb': -6,
   'cb': -7,
 };
-export const NOTES = [
+export const NOTES: string[][] = [
   ['a', 'g##', 'bbb'],
   ['a#', 'bb', 'cbb'],
   ['b', 'a##', 'cb'],
@@ -88,8 +88,8 @@ export const NOTES = [
   ['g#', 'ab'],
 ];
 
-export const MAX_TEMPO = 300;
-export const MIN_TEMPO = 20;
-export const MIN_RANGE = 21;
-export const MAX_RANGE = 128;
-export const MAX_INTERVAL = 8;
+export const MAX_TEMPO: number = 300;
+export const MIN_TEMPO: number = 20;
+export const MIN_RANGE: number = 21;
+export const MAX_RANGE: number = 128;
+export const MAX_INTERVAL: number = 8;
