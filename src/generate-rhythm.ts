@@ -1,7 +1,7 @@
-import { timeSignatureSplit, rhythmKey } from './constants';
+import { TIME_SIG_SPLITS, RHYTHMS, rhythm } from './constants';
 import { getRandomIndex } from './helpers';
 
-export function generateRhythms(numBars: number, timeSignature: [number, number]): rhythmKey[][] {
+export function generateRhythms(numBars: number, timeSignature: [number, number]): rhythm[][] {
   const rhythms = [];
   for (let _ = 0; _ < numBars; _++) {
     rhythms.push(generateOneBar(timeSignature));
@@ -9,13 +9,13 @@ export function generateRhythms(numBars: number, timeSignature: [number, number]
   return rhythms;
 }
 
-export function generateOneBar([numerator, denominator]: [number, number]): rhythmKey[] {
-  const baseRhythmValue = rhythmKey.find(rhythmObj => denominator == rhythmObj.number)?.value;
-  const split = timeSignatureSplit[numerator];
+export function generateOneBar([numerator, denominator]: [number, number]): rhythm[] {
+  const baseRhythmValue = RHYTHMS.find(rhythmObj => denominator == rhythmObj.number)?.value;
+  const split = TIME_SIG_SPLITS[numerator];
   if (!split || !baseRhythmValue) throw Error('Time signature not valid.');
   let remaining = baseRhythmValue * numerator;
 
-  const bar: rhythmKey[] = [];
+  const bar: rhythm[] = [];
 
   // TODO: Randomize split order? Reverse?
   if (split.length > 1) {
@@ -24,7 +24,7 @@ export function generateOneBar([numerator, denominator]: [number, number]): rhyt
       remaining -= baseRhythmValue * splitNumerator;
     }
   } else {
-    const possibleRhythms = Array.from(rhythmKey);
+    const possibleRhythms = Array.from(RHYTHMS);
     while (remaining != 0) {
       while (possibleRhythms[possibleRhythms.length - 1].value > remaining) {
         possibleRhythms.pop();

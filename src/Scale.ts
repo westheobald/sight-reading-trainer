@@ -1,4 +1,4 @@
-import { scalesKey, possibleNotes } from './constants';
+import { SCALES, ROOT_NOTES } from './constants';
 
 export class Scale {
   numericFormula: string[];
@@ -7,7 +7,7 @@ export class Scale {
   rootNote: string;
 
   constructor(scaleName: string, rootNote: string) {
-    const scale = scalesKey[scaleName];
+    const scale = SCALES[scaleName];
     if (!scale) throw Error('Invalid scale');
     ({
       numericFormula: this.numericFormula,
@@ -16,7 +16,7 @@ export class Scale {
     } = scale);
 
     this.rootNote = (function validateRootNote(root) {
-      if (possibleNotes.has(root)) return root;
+      if (ROOT_NOTES.hasOwnProperty(root)) return root;
       throw Error('Invalid root note');
     })(rootNote);
   }
