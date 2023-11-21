@@ -72,18 +72,6 @@ describe('Scale Testing', function scaleTests() {
   });
 });
 
-describe('Root Notes and Key Signatures', function keySignatureTests() {
-  test('Key Signature', function validKeySignatureAccidentals() {
-    const circleOfFifths = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#'];
-    const circleOfFourths = ['c', 'f', 'bb', 'eb', 'ab', 'db', 'gb', 'cb'];
-    for (let i = 0; i < circleOfFifths.length; i++) {
-      expect(i).toBe(ROOT_NOTES[circleOfFifths[i]]);
-      expect(i - 2 * i).toBe(ROOT_NOTES[circleOfFourths[i]]);
-    }
-    expect(Object.keys(ROOT_NOTES).length).toBe(circleOfFifths.length + circleOfFourths.length - 1);
-  });
-});
-
 describe('Max/Min Constants', function maxMinConstantTests() {
   test('Ensure Integers', function maxMinIntergers() {
     const tests = [MAX_RANGE, MIN_RANGE, MAX_TEMPO, MIN_TEMPO, MAX_INTERVAL];

@@ -1,16 +1,23 @@
 import { TIME_SIG_SPLITS, RHYTHMS, rhythm } from './constants';
 import { getRandomIndex } from './helpers';
 
-export function generateRhythms(numBars: number, timeSignature: [number, number]): rhythm[][] {
+export function generateRhythms(
+  numBars: number,
+  timeSignature: [number, number],
+  defaultRhythms: rhythm[],
+): rhythm[][] {
   const rhythms = [];
   for (let _ = 0; _ < numBars; _++) {
-    rhythms.push(generateOneBar(timeSignature));
+    rhythms.push(generateOneBar(timeSignature, defaultRhythms));
   }
   return rhythms;
 }
 
-export function generateOneBar([numerator, denominator]: [number, number]): rhythm[] {
-  const baseRhythmValue = RHYTHMS.find(rhythmObj => denominator == rhythmObj.number)?.value;
+export function generateOneBar(
+  [numerator, denominator]: [number, number],
+  rhythms: rhythm[],
+): rhythm[] {
+  const baseRhythmValue = RHYTHMS.find((rhythmObj) => denominator == rhythmObj.number)?.value;
   const split = TIME_SIG_SPLITS[numerator];
   if (!split || !baseRhythmValue) throw Error('Time signature not valid.');
   let remaining = baseRhythmValue * numerator;
@@ -20,19 +27,19 @@ export function generateOneBar([numerator, denominator]: [number, number]): rhyt
   // TODO: Randomize split order? Reverse?
   if (split.length > 1) {
     for (const splitNumerator of split) {
-      bar.push(...generateOneBar([splitNumerator, denominator]));
+      bar.push(...generateOneBar([splitNumerator, denominator], rhythms));
       remaining -= baseRhythmValue * splitNumerator;
     }
   } else {
-    const possibleRhythms = Array.from(RHYTHMS);
+    let allowedValues = rhythms.length;
     while (remaining != 0) {
-      while (possibleRhythms[possibleRhythms.length - 1].value > remaining) {
-        possibleRhythms.pop();
-        if (possibleRhythms.length == 0) throw Error('Rhythm calculation error');
+      while (rhythms[allowedValues - 1].value > remaining) {
+        allowedValues--;
+        if (allowedValues == 0) throw Error('Rhythm calculation error');
       }
-      const rhythm = possibleRhythms[getRandomIndex(possibleRhythms.length)];
-      bar.push(rhythm);
-      remaining -= rhythm.value;
+      const currentRhythm = rhythms[getRandomIndex(allowedValues)];
+      bar.push(currentRhythm);
+      remaining -= currentRhythm.value;
     }
   }
   return bar;

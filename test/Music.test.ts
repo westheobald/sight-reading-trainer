@@ -1,5 +1,14 @@
 import { Music } from '../src/Music';
-import { MAX_INTERVAL, MAX_RANGE, MAX_TEMPO, MIN_RANGE, MIN_TEMPO, ROOT_NOTES, SCALES, TIME_SIGNATURES } from '../src/constants';
+import {
+  MAX_INTERVAL,
+  MAX_RANGE,
+  MAX_TEMPO,
+  MIN_RANGE,
+  MIN_TEMPO,
+  ROOT_NOTES,
+  SCALES,
+  TIME_SIGNATURES,
+} from '../src/constants';
 
 describe('Music Validation Functions', () => {
   test('Valid Root Notes', () => {
@@ -64,7 +73,12 @@ describe('Music Validation Functions', () => {
   });
   test('Invalid Time Signatures', () => {
     const func = Music.validateTimeSignature;
-    const invalid: [number, number][] = [[8,4],[1,4],[4,2],[14,4]];
+    const invalid: [number, number][] = [
+      [8, 4],
+      [1, 4],
+      [4, 2],
+      [14, 4],
+    ];
     for (const timeSig of invalid) {
       expect(() => func(timeSig)).toThrow();
     }
@@ -73,13 +87,18 @@ describe('Music Validation Functions', () => {
     const func = Music.validateRange;
     for (let i = MIN_RANGE; i <= MAX_RANGE - 12; i++) {
       for (let j = i + 12; j <= MAX_RANGE; j++) {
-        expect(String(func([i,j]))).toBe(String([i,j]));
+        expect(String(func([i, j]))).toBe(String([i, j]));
       }
     }
   });
   test('Invalid Range', () => {
     const func = Music.validateRange;
-    const invalid: [number, number][] = [[20, 50],[21,32],[117,128],[118,129]];
+    const invalid: [number, number][] = [
+      [20, 50],
+      [21, 32],
+      [117, 128],
+      [118, 129],
+    ];
     for (const range of invalid) {
       expect(() => func(range)).toThrow();
     }
@@ -96,12 +115,12 @@ describe('Music Validation Functions', () => {
     const func = Music.validateIntervalSize;
     for (const scale of Object.values(SCALES)) {
       for (let i = 0; i < scale.maxInterval; i++) {
-        expect(()=>func(i, scale)).toThrow();
+        expect(() => func(i, scale)).toThrow();
       }
     }
   });
   test('getNotes Major', () => {
-    const func = Music.getNotes;
+    const func = Music.getNoteNames;
     const testScales: [string, string[]][] = [
       ['c', ['c', 'd', 'e', 'f', 'g', 'a', 'b']],
       ['db', ['db', 'eb', 'f', 'gb', 'ab', 'bb', 'c']],
@@ -130,7 +149,7 @@ describe('Music Validation Functions', () => {
     }
   });
   test('getNotes Major Pentatonic', () => {
-    const func = Music.getNotes;
+    const func = Music.getNoteNames;
     const testScales: [string, string[]][] = [
       ['c', ['c', 'd', 'e', 'g', 'a']],
       ['db', ['db', 'eb', 'f', 'ab', 'bb']],

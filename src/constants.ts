@@ -3,6 +3,7 @@ export type rhythm = {
   number: number;
   value: number;
   dotted: boolean;
+  ms?: number;
 };
 export const RHYTHMS: rhythm[] = [
   { string: '16', number: 16, value: 0.0625, dotted: false },
@@ -40,38 +41,39 @@ export type scale = {
   numericFormula: string[];
   intervallicFormula: number[];
   maxInterval: number;
+  notes?: string[];
 };
 export const SCALES: { [key: string]: scale } = {
   major: {
     major: true,
     numericFormula: ['1', '2', '3', '4', '5', '6', '7'],
-    intervallicFormula: [0, 2, 2, 1, 2, 2, 2, 1],
+    intervallicFormula: [2, 2, 1, 2, 2, 2, 1],
     maxInterval: 2,
   },
   majorPentatonic: {
     major: true,
     numericFormula: ['1', '2', '3', '5', '6'],
-    intervallicFormula: [0, 2, 2, 3, 2, 3],
+    intervallicFormula: [2, 2, 3, 2, 3],
     maxInterval: 3,
   },
 };
 
 export const ROOT_NOTES: { [key: string]: number } = {
-  'c': 0,
-  'g': 1,
-  'd': 2,
-  'a': 3,
-  'e': 4,
-  'b': 5,
-  'f#': 6,
-  'c#': 7,
-  'f': -1,
-  'bb': -2,
-  'eb': -3,
-  'ab': -4,
-  'db': -5,
-  'gb': -6,
-  'cb': -7,
+  'a': 0,
+  'bb': 1,
+  'b': 2,
+  'cb': 2,
+  'c': 3,
+  'c#': 4,
+  'db': 4,
+  'd': 5,
+  'eb': 6,
+  'e': 7,
+  'f': 8,
+  'f#': 9,
+  'gb': 9,
+  'g': 10,
+  'ab': 11,
 };
 export const NOTES: string[][] = [
   ['a', 'g##', 'bbb'],
