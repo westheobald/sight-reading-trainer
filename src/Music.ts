@@ -83,7 +83,7 @@ export class Music {
       if (
         !Number.isInteger(maxScaleSteps) ||
         maxScaleSteps < 1 ||
-        maxScaleSteps > scale.numericFormula.length // TODO: limits max interval to octave
+        maxScaleSteps > scale.numericFormula.length // TODO: limits max interval to octave, allow greater?
       ) {
         throw Error('Invalid interval size');
       }
@@ -92,10 +92,10 @@ export class Music {
 
     this.range = (function validateRange(scale, maxScaleSteps) {
       const [minRange, maxRange] = range;
-      if (minRange < MIN_RANGE || maxRange > MAX_RANGE) {
+      if (minRange < MIN_RANGE || maxRange > MAX_RANGE || minRange > maxRange) {
         throw Error('Invalid range');
       }
-      if (maxScaleSteps * scale.maxInterval > maxRange - minRange + 1) {
+      if (maxScaleSteps * scale.maxInterval > Math.floor((maxRange - minRange + 1) / 2) * 12) {
         throw Error('Invalid range (maxScaleSteps/range)');
       }
       return range;

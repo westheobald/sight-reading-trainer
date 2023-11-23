@@ -94,7 +94,5 @@ export const MAX_TEMPO: number = 300;
 export const MIN_TEMPO: number = 20;
 export const MIN_RANGE: number = 21;
 export const MAX_RANGE: number = 128;
-export const MIN_SCALE_STEPS = 1
-export const MAX_SCALE_STEPS: number = 8;
 export const REPEATED_NOTE_PERCENTAGE: number = 0.05;
 export const TUNING_FREQUENCY = 440;
