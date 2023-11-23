@@ -34,17 +34,18 @@ export function generateNotes(
   return notes;
 }
 
-function getStartingNote(
+export function getStartingNote(
   scale: scale,
   rootNote: string,
   [lowRange, highRange]: [number, number],
 ): [number, number] {
   const scaleDegree = getRandomIndex(scale.intervallicFormula.length);
   const increase = scale.intervallicFormula
-    .slice(0, scaleDegree + 1)
-    .reduce((acc, curr) => acc + curr);
+    .slice(0, scaleDegree)
+    .reduce((acc, curr) => acc + curr, 0);
   let possibleNotes = [];
-  for (let note = ROOT_NOTES[rootNote]; note <= highRange; note += increase) {
+  console.log(scaleDegree, scale, increase)
+  for (let note = ROOT_NOTES[rootNote] + increase; note <= highRange; note += 12) {
     if (note >= lowRange) possibleNotes.push(note);
   }
   return [possibleNotes[getRandomIndex(possibleNotes.length)], scaleDegree];

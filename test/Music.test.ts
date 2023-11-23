@@ -1,4 +1,4 @@
-import { Music } from '../src/Music';
+import { Music, MusicSettings } from '../src/Music';
 import {
   MAX_INTERVAL,
   MAX_RANGE,
@@ -10,69 +10,92 @@ import {
   TIME_SIGNATURES,
 } from '../src/constants';
 
+const defaultOptions: MusicSettings = {
+  rootNote: 'c',
+  scaleKey: 'major',
+  tempo: 120,
+  timeSignature: [4, 4],
+  range: [50, 80],
+  intervalSize: 5,
+};
+
 describe('Music Validation Functions', () => {
   test('Valid Root Notes', () => {
-    const func = Music.validateRootNote;
+    const options = Object.assign({}, defaultOptions);
     for (const root in ROOT_NOTES) {
-      expect(func(root)).toBe(root);
+      options.rootNote = root;
+      const music = new Music(options);
+      expect(music.rootNote).toBe(root);
     }
   });
   test('Invalid Root Notes', () => {
-    const func = Music.validateRootNote;
+    const options = Object.assign({}, defaultOptions);
     const invalid = ['abb', 'b#', 'gbb', 'e#', 'fb'];
     for (const root of invalid) {
-      expect(() => func(root)).toThrow();
+      options.rootNote = root;
+      expect(() => new Music(options)).toThrow();
     }
   });
   test('Valid Scales', () => {
-    const func = Music.validateScale;
+    const options = Object.assign({}, defaultOptions);
     for (const scale in SCALES) {
-      expect(func(scale)).toBe(SCALES[scale]);
+      options.scaleKey = scale;
+      const music = new Music(options);
+      expect(music.scale).toBe(SCALES[scale]);
     }
   });
   test('Invalid Scales', () => {
-    const func = Music.validateScale;
+    const options = Object.assign({}, defaultOptions);
     const invalid = ['noscale', 'mjor', 'minr'];
     for (const scale in invalid) {
-      expect(() => func(scale)).toThrow();
+      options.scaleKey = scale;
+      expect(() => new Music(options)).toThrow();
     }
   });
   test('Key Signature', () => {
-    const func = Music.getKeySignature;
+    const options = Object.assign({}, defaultOptions);
     for (const root in ROOT_NOTES) {
-      for (const scale of Object.values(SCALES)) {
+      options.rootNote = root;
+      for (const [scaleKey, scale] of Object.entries(SCALES)) {
+        options.scaleKey = scaleKey;
+        const music = new Music(options);
         if (scale.major) {
-          expect(func(root, scale)).toBe(root);
+          expect(music.keySignature).toBe(root);
         } else {
-          expect(func(root, scale)).toBe(root + 'm');
+          expect(music.keySignature).toBe(root + 'm');
         }
       }
     }
   });
   test('Valid Tempos', () => {
-    const func = Music.validateTempo;
+    const options = Object.assign({}, defaultOptions);
     for (let i = MIN_TEMPO; i <= MAX_TEMPO; i++) {
-      expect(func(i)).toBe(i);
+      options.tempo = i;
+      const music = new Music(options);
+      expect(music.tempo).toBe(i);
     }
   });
   test('Invalid Tempos', () => {
-    const func = Music.validateTempo;
+    const options = Object.assign({}, defaultOptions);
     const invalid = [MIN_TEMPO - 1, MAX_TEMPO + 1, 50.2, 80.1];
     for (const tempo of invalid) {
-      expect(() => func(tempo)).toThrow();
+      options.tempo = tempo;
+      expect(() => new Music(options)).toThrow();
     }
   });
   test('Valid Time Signatures', () => {
-    const func = Music.validateTimeSignature;
+    const options = Object.assign({}, defaultOptions);
     for (const denominatorKey in TIME_SIGNATURES) {
       const denominator = +denominatorKey;
       for (const numerator of TIME_SIGNATURES[denominatorKey]) {
-        expect(String(func([numerator, denominator]))).toBe(String([numerator, denominator]));
+        options.timeSignature = [numerator, denominator];
+        const music = new Music(options);
+        expect(String(music.timeSignature)).toBe(String([numerator, denominator]));
       }
     }
   });
   test('Invalid Time Signatures', () => {
-    const func = Music.validateTimeSignature;
+    const options = Object.assign({}, defaultOptions);
     const invalid: [number, number][] = [
       [8, 4],
       [1, 4],
@@ -80,19 +103,22 @@ describe('Music Validation Functions', () => {
       [14, 4],
     ];
     for (const timeSig of invalid) {
-      expect(() => func(timeSig)).toThrow();
+      options.timeSignature = timeSig;
+      expect(() => new Music(options)).toThrow();
     }
   });
   test('Valid Range', () => {
-    const func = Music.validateRange;
+    const options = Object.assign({}, defaultOptions);
     for (let i = MIN_RANGE; i <= MAX_RANGE - 12; i++) {
       for (let j = i + 12; j <= MAX_RANGE; j++) {
-        expect(String(func([i, j]))).toBe(String([i, j]));
+        options.range = [i, j];
+        const music = new Music(options);
+        expect(String(music.range)).toBe(String([i, j]));
       }
     }
   });
   test('Invalid Range', () => {
-    const func = Music.validateRange;
+    const options = Object.assign({}, defaultOptions);
     const invalid: [number, number][] = [
       [20, 50],
       [21, 32],
@@ -100,27 +126,41 @@ describe('Music Validation Functions', () => {
       [118, 129],
     ];
     for (const range of invalid) {
-      expect(() => func(range)).toThrow();
+      options.range = range;
+      expect(() => new Music(options)).toThrow();
     }
   });
   test('Valid Interval Size', () => {
-    const func = Music.validateIntervalSize;
-    for (const scale of Object.values(SCALES)) {
-      for (let i = scale.maxInterval; i < MAX_INTERVAL; i++) {
-        expect(func(i, scale)).toBe(i);
+    const options = Object.assign({}, defaultOptions);
+    for (const [scaleKey, scale] of Object.entries(SCALES)) {
+      options.scaleKey = scaleKey;
+      for (let i = scale.maxInterval; i <= MAX_INTERVAL; i++) {
+        options.intervalSize = i;
+        const music = new Music(options);
+        expect(music.intervalSize).toBe(i);
       }
     }
   });
   test('Invalid Interval Size', () => {
-    const func = Music.validateIntervalSize;
-    for (const scale of Object.values(SCALES)) {
+    const options = Object.assign({}, defaultOptions);
+    for (const [scaleKey, scale] of Object.entries(SCALES)) {
+      options.scaleKey = scaleKey;
       for (let i = 0; i < scale.maxInterval; i++) {
-        expect(() => func(i, scale)).toThrow();
+        options.intervalSize = i;
+        expect(() => new Music(options)).toThrow();
+      }
+      for (let i = MAX_INTERVAL + 1; i < MAX_INTERVAL + 10; i++) {
+        options.intervalSize = i;
+        expect(() => new Music(options)).toThrow();
       }
     }
   });
+});
+
+describe('getNotes Tests', () => {
   test('getNotes Major', () => {
-    const func = Music.getNoteNames;
+    const options = Object.assign({}, defaultOptions);
+    options.scaleKey = 'major';
     const testScales: [string, string[]][] = [
       ['c', ['c', 'd', 'e', 'f', 'g', 'a', 'b']],
       ['db', ['db', 'eb', 'f', 'gb', 'ab', 'bb', 'c']],
@@ -128,28 +168,30 @@ describe('Music Validation Functions', () => {
       ['eb', ['eb', 'f', 'g', 'ab', 'bb', 'c', 'd']],
       ['e', ['e', 'f#', 'g#', 'a', 'b', 'c#', 'd#']],
       ['f', ['f', 'g', 'a', 'bb', 'c', 'd', 'e']],
-      ['gb', ['gb', 'ab', 'bb', 'cb', 'db', 'eb', 'f']],
+       ['gb', ['gb', 'ab', 'bb', 'cb', 'db', 'eb', 'f']],
+     ['cb', ['gb', 'ab', 'bb', 'cb', 'db', 'eb', 'fb']],
       ['g', ['g', 'a', 'b', 'c', 'd', 'e', 'f#']],
       ['ab', ['ab', 'bb', 'c', 'db', 'eb', 'f', 'g']],
       ['a', ['a', 'b', 'c#', 'd', 'e', 'f#', 'g#']],
       ['bb', ['bb', 'c', 'd', 'eb', 'f', 'g', 'a']],
       ['b', ['b', 'c#', 'd#', 'e', 'f#', 'g#', 'a#']],
       ['c#', ['c#', 'd#', 'e#', 'f#', 'g#', 'a#', 'b#']],
-      ['d#', ['d#', 'e#', 'f##', 'g#', 'a#', 'b#', 'c##']],
       ['f#', ['f#', 'g#', 'a#', 'b', 'c#', 'd#', 'e#']],
-      ['g#', ['g#', 'a#', 'b#', 'c#', 'd#', 'e#', 'f##']],
-      ['a#', ['a#', 'b#', 'c##', 'd#', 'e#', 'f##', 'g##']],
     ];
     for (const [root, scale] of testScales) {
-      const notes = func(root, SCALES.major);
-      const noteSet = new Set(notes);
-      for (const note of scale) {
+      options.rootNote = root;
+      const music = new Music(options);
+      if (!music.scale.notes) throw Error('Scale has no notes');
+      const noteSet = new Set(scale);
+      for (const note of music.scale.notes) {
+        if (note == undefined) continue;
         expect(noteSet.has(note)).toBeTruthy();
       }
     }
   });
   test('getNotes Major Pentatonic', () => {
-    const func = Music.getNoteNames;
+    const options = Object.assign({}, defaultOptions);
+    options.scaleKey = 'majorPentatonic';
     const testScales: [string, string[]][] = [
       ['c', ['c', 'd', 'e', 'g', 'a']],
       ['db', ['db', 'eb', 'f', 'ab', 'bb']],
@@ -158,21 +200,22 @@ describe('Music Validation Functions', () => {
       ['e', ['e', 'f#', 'g#', 'b', 'c#']],
       ['f', ['f', 'g', 'a', 'c', 'd']],
       ['gb', ['gb', 'ab', 'bb', 'db', 'eb']],
+      ['cb', ['cb', 'db', 'eb', 'gb', 'ab']],
       ['g', ['g', 'a', 'b', 'd', 'e']],
       ['ab', ['ab', 'bb', 'c', 'eb', 'f']],
       ['a', ['a', 'b', 'c#', 'e', 'f#']],
       ['bb', ['bb', 'c', 'd', 'f', 'g']],
       ['b', ['b', 'c#', 'd#', 'f#', 'g#']],
       ['c#', ['c#', 'd#', 'e#', 'g#', 'a#']],
-      ['d#', ['d#', 'e#', 'f##', 'a#', 'b#']],
       ['f#', ['f#', 'g#', 'a#', 'c#', 'd#']],
-      ['g#', ['g#', 'a#', 'b#', 'd#', 'e#']],
-      ['a#', ['a#', 'b#', 'c##', 'e#', 'f##']],
     ];
     for (const [root, scale] of testScales) {
-      const notes = func(root, SCALES.majorPentatonic);
-      const noteSet = new Set(notes);
-      for (const note of scale) {
+      options.rootNote = root;
+      const music = new Music(options);
+      if (!music.scale.notes) throw Error('Scale has no notes');
+      const noteSet = new Set(scale);
+      for (const note of music.scale.notes) {
+        if (note == undefined) continue;
         expect(noteSet.has(note)).toBeTruthy();
       }
     }

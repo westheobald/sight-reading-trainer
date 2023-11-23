@@ -10,16 +10,15 @@ import {
   ROOT_NOTES,
   SCALES,
   TIME_SIGNATURES,
-  TIME_SIG_SPLITS,
   rhythm,
   scale,
 } from './constants';
 import { generateNotes } from './generate-notes';
 import { generateRhythms } from './generate-rhythm';
 
-type MusicType = {
+export type MusicSettings = {
   rootNote: string;
-  scale: string;
+  scaleKey: string;
   tempo: number;
   timeSignature: [number, number];
   range: [number, number];
@@ -36,92 +35,95 @@ export class Music {
   range: [number, number];
   intervalSize: number;
 
-  constructor({ rootNote, scale, tempo, timeSignature, range, intervalSize }: MusicType) {
-    this.rootNote = Music.validateRootNote(rootNote);
-    this.scale = Music.validateScale(scale);
-    this.scale.notes = Music.getNoteNames(this.rootNote, this.scale);
-    this.keySignature = Music.getKeySignature(this.rootNote, this.scale);
-    this.tempo = Music.validateTempo(tempo);
-    this.timeSignature = Music.validateTimeSignature(timeSignature);
-    this.rhythms = Music.getRhythms(this.tempo, this.timeSignature[0]);
-    this.range = Music.validateRange(range);
-    this.intervalSize = Music.validateIntervalSize(intervalSize, this.scale);
-    this.melody = [];
-  }
-  static validateRootNote(rootNote: string): string {
-    if (!ROOT_NOTES.hasOwnProperty(rootNote)) {
-      throw Error('Invalid root note');
-    }
-    return rootNote;
-  }
-  static validateScale(scaleKey: string): scale {
-    const scale = SCALES[scaleKey];
-    if (!scale) throw Error('Invalid scale');
-    return scale;
-  }
-  static getKeySignature(rootNote: string, scale: scale): string {
-    if (!scale.major) rootNote += 'm';
-    return rootNote;
-  }
-  static getNoteNames(rootNote: string, scale: scale): string[] {
-    const musicAlphabet = 'abcdefg';
-    let alphabetIndex = musicAlphabet.indexOf(rootNote[0]);
-    let noteIndex = NOTES.findIndex((arr) => arr.includes(rootNote));
-    const notes = new Array(NOTES.length);
-    notes[noteIndex] = rootNote;
+  constructor({ rootNote, scaleKey, tempo, timeSignature, range, intervalSize }: MusicSettings) {
+    this.rootNote = (function validateRootNote() {
+      if (!ROOT_NOTES.hasOwnProperty(rootNote)) throw Error('Invalid root note');
+      return rootNote;
+    })();
 
-    let previousNumber = 1;
-    for (let i = 1; i < scale.numericFormula.length; i++) {
-      const numStr = scale.numericFormula[i].at(-1);
-      if (numStr == undefined) throw Error('Invalid scale formula');
-      const num = +numStr;
-      if (num > previousNumber) {
-        alphabetIndex = (alphabetIndex + (num - previousNumber)) % 7;
-        previousNumber = num;
+    this.scale = (function validateScale() {
+      const scale = SCALES[scaleKey];
+      if (!scale) throw Error('Invalid scale');
+      return scale;
+    })();
+
+    this.keySignature = (function getKeySignature(scale) {
+      let keySignature = rootNote;
+      if (!scale.major) keySignature += 'm';
+      return keySignature;
+    })(this.scale);
+
+    this.tempo = (function validateTempo() {
+      if (!Number.isInteger(tempo) || tempo < MIN_TEMPO || tempo > MAX_TEMPO) {
+        throw Error('Invalid tempo');
       }
-      noteIndex = (noteIndex + scale.intervallicFormula[i - 1]) % NOTES.length;
-      notes[noteIndex] = NOTES[noteIndex].find((note) => note[0] == musicAlphabet[alphabetIndex]);
-    }
-    return notes;
-  }
-  static validateTempo(tempo: number) {
-    if (!Number.isInteger(tempo) || tempo < MIN_TEMPO || tempo > MAX_TEMPO) {
-      throw Error('Invalid tempo');
-    }
-    return tempo;
-  }
-  static validateTimeSignature(timeSignature: [number, number]): [number, number] {
-    const [numerator, denominator] = timeSignature;
-    if (!TIME_SIGNATURES[denominator] || !TIME_SIGNATURES[denominator].includes(numerator)) {
-      throw Error('Invalid time signature');
-    }
-    return timeSignature;
-  }
-  static getRhythms(tempo: number, numerator: number) {
-    const baseRhythmMs = 60000 / tempo;
-    const baseRhythm = RHYTHMS.find((rhythm) => rhythm.number == numerator && !rhythm.dotted);
-    if (!baseRhythm) throw Error('Invalid rhythm (time signature)');
-    const rhythms: rhythm[] = Array.from(RHYTHMS);
-    for (const rhythm of rhythms) {
-      rhythm.ms = (baseRhythmMs * rhythm.value) / baseRhythm.value;
-    }
-    return rhythms;
-  }
-  static validateRange(range: [number, number]): [number, number] {
-    const [minRange, maxRange] = range;
-    if (minRange < MIN_RANGE || maxRange > MAX_RANGE || maxRange - minRange < 12) {
-      throw Error('Invalid range');
-    }
-    return range;
-  }
-  static validateIntervalSize(intervalSize: number, scale: scale): number {
-    if (intervalSize < 2 || intervalSize < scale.maxInterval || intervalSize > MAX_INTERVAL) {
-      throw Error('Invalid interval size');
-    }
-    return intervalSize;
+      return tempo;
+    })();
+
+    this.timeSignature = (function validateTimeSignature() {
+      const [numerator, denominator] = timeSignature;
+      if (!TIME_SIGNATURES[denominator] || !TIME_SIGNATURES[denominator].includes(numerator)) {
+        throw Error('Invalid time signature');
+      }
+      return timeSignature;
+    })();
+
+    this.rhythms = (function getRhythms(tempo, [,denominator]) {
+      const baseRhythm = RHYTHMS.find((rhythm) => rhythm.number == denominator && !rhythm.dotted);
+      if (!baseRhythm) throw Error('Invalid rhythm (time signature)');
+      const baseRhythmInMs = 60_000 / tempo;
+      const rhythms: rhythm[] = Array.from(RHYTHMS);
+      for (const rhythm of rhythms) {
+        rhythm.ms = (baseRhythmInMs * rhythm.value) / baseRhythm.value;
+      }
+      return rhythms;
+    })(this.tempo, this.timeSignature);
+
+    this.range = (function validateRange() {
+      const [minRange, maxRange] = range;
+      if (minRange < MIN_RANGE || maxRange > MAX_RANGE || maxRange - minRange < 12) {
+        throw Error('Invalid range');
+      }
+      return range;
+    })();
+
+    this.intervalSize = (function validateIntervalSize(scale) {
+      if (
+        !Number.isInteger(intervalSize) ||
+        intervalSize < 1 ||
+        intervalSize < scale.maxInterval ||
+        intervalSize > MAX_INTERVAL
+      ) {
+        throw Error('Invalid interval size');
+      }
+      return intervalSize;
+    })(this.scale);
+
+    this.scale.notes = (function getNotes(rootNote, scale) {
+      const musicAlphabet = 'abcdefg';
+      let alphabetIndex = musicAlphabet.indexOf(rootNote[0]);
+      let noteIndex = NOTES.findIndex((arr) => arr.includes(rootNote));
+      const notes = new Array(NOTES.length);
+      notes[noteIndex] = rootNote;
+
+      let previousNumber = 1;
+      for (let i = 1; i < scale.numericFormula.length; i++) {
+        const num = Number(scale.numericFormula[i].at(-1));
+        if (Number.isNaN(num)) throw Error('Invalid scale formula');
+        if (num > previousNumber) {
+          alphabetIndex = (alphabetIndex + num - previousNumber) % musicAlphabet.length;
+          previousNumber = num;
+        }
+        noteIndex = (noteIndex + scale.intervallicFormula[i - 1]) % NOTES.length;
+        notes[noteIndex] = NOTES[noteIndex].find((note) => note[0] == musicAlphabet[alphabetIndex]);
+      }
+      return notes;
+    })(this.rootNote, this.scale);
+
+    this.melody = [];
   }
   generateMelody(numBars: number) {
     const rhythms = generateRhythms(numBars, this.timeSignature, this.rhythms);
-    //const notes = generateNotes(rhythms, this.scale, this.range, this.intervalSize);
+    const notes = generateNotes(rhythms, this.scale, this.rootNote, this.range, this.intervalSize);
   }
 }
