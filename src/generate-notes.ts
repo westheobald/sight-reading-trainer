@@ -1,5 +1,5 @@
-import { rhythm, ROOT_NOTES, scale } from './constants';
-import { getRandomIndex } from './helpers';
+import { REPEATED_NOTE_PERCENTAGE, rhythm, ROOT_NOTES, scale } from './constants';
+import { getRandomIndex, getRandomInterval } from './helpers';
 import { Note } from './Note';
 
 export function generateNotes(
@@ -44,51 +44,62 @@ export function getStartingNote(
     .slice(0, scaleDegree)
     .reduce((acc, curr) => acc + curr, 0);
   let possibleNotes = [];
-  console.log(scaleDegree, scale, increase)
-  for (let note = ROOT_NOTES[rootNote] + increase; note <= highRange; note += 12) {
+  for (let note = ((ROOT_NOTES[rootNote] + increase) % 12) + 21; note <= highRange; note += 12) {
     if (note >= lowRange) possibleNotes.push(note);
   }
   return [possibleNotes[getRandomIndex(possibleNotes.length)], scaleDegree];
 }
 
-function getNextNote(
+export function getNextNote(
   scale: scale,
   [lowRange, highRange]: [number, number],
   previousNote: number,
   previousIndex: number,
-  intervalSize: number,
+  maxInterval: number,
 ) {
-  const interval = getRandomIndex(intervalSize) + 1;
+  const interval = getRandomInterval(maxInterval); // returns [1, maxInterval] inclusive
+  if (Math.random() < REPEATED_NOTE_PERCENTAGE) return [previousNote, previousIndex];
   const ascending = Boolean(Math.round(Math.random()));
+  let repeated = false;
   if (ascending) {
-    var [increase, currentIndex] = getAscending();
-    if (previousNote + increase > highRange) {
-      [increase, currentIndex] = getDescending();
-    }
-  } else {
-    var [increase, currentIndex] = getDescending();
-    if (previousNote + increase < lowRange) {
-      [increase, currentIndex] = getAscending();
-    }
-  }
-  return [previousNote + increase, currentIndex];
-  function getAscending() {
-    let increase = 0;
+    [previousNote, previousIndex] = getAscending(previousNote, previousIndex, interval);
+  } else [previousNote, previousIndex] = getDescending(previousNote, previousIndex, interval);
+  return [previousNote, previousIndex];
+
+  function getAscending(
+    previousNote: number,
+    previousIndex: number,
+    interval: number,
+  ): [number, number] {
     let index = previousIndex;
-    for (let _ = 0; _ < interval; _++) {
-      index = (index + 1) % scale.intervallicFormula.length;
+    let increase = 0;
+    for (let i = 0; i < interval; i++) {
       increase += scale.intervallicFormula[index];
+      index = (index + 1) % scale.intervallicFormula.length;
     }
-    return [increase, index];
+    if (previousNote + increase > highRange) {
+      if (repeated) getDescending(previousNote, previousIndex, interval - 1);
+      repeated = true;
+      return getDescending(previousNote, previousIndex, interval);
+    }
+    return [previousNote + increase, index];
   }
-  function getDescending() {
-    let increase = 0;
+  function getDescending(
+    previousNote: number,
+    previousIndex: number,
+    interval: number,
+  ): [number, number] {
     let index = previousIndex;
-    for (let _ = 0; _ < interval; _++) {
-      index--;
-      if (index == -1) index = scale.intervallicFormula.length - 1;
-      increase -= scale.intervallicFormula[index];
+    let change = 0;
+    for (let i = 0; i < interval; i++) {
+      index = index - 1 >= 0 ? index - 1 : scale.intervallicFormula.length - 1;
+      change += scale.intervallicFormula[index];
     }
-    return [increase, index];
+    if (previousNote - change < lowRange) {
+      if (repeated) getAscending(previousNote, previousIndex, interval - 1);
+      repeated = true;
+      return getAscending(previousNote, previousIndex, interval);
+    }
+    return [previousNote - change, index];
   }
 }

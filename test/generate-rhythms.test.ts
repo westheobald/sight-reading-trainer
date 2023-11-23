@@ -7,8 +7,7 @@ describe('Generate Rhythms Testing', () => {
       for (const denominatorKey in TIME_SIGNATURES) {
         const denominator = Number(denominatorKey);
         for (const numerator of TIME_SIGNATURES[denominatorKey]) {
-          const defaultRhythms = Array.from(RHYTHMS);
-          const rhythms = generateRhythms(numBars, [numerator, denominator], defaultRhythms);
+          const rhythms = generateRhythms(numBars, [numerator, denominator], RHYTHMS);
           let total = 0;
           const baseRhythmValue = RHYTHMS.find((rhythm) => {
             return !rhythm.dotted && rhythm.number == denominator;

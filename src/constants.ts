@@ -59,21 +59,21 @@ export const SCALES: { [key: string]: scale } = {
 };
 
 export const ROOT_NOTES: { [key: string]: number } = {
-  'a': -3,
-  'bb': -2,
-  'b': -1,
-  'cb': -1,
-  'c': 0,
-  'c#': 1,
-  'db': 1,
-  'd': 2,
-  'eb': 3,
-  'e': 4,
-  'f': 5,
-  'f#': 6,
-  'gb': 6,
-  'g': 7,
-  'ab': 8,
+  'a': 0,
+  'bb': 1,
+  'b': 2,
+  'cb': 2,
+  'c': 3,
+  'c#': 4,
+  'db': 4,
+  'd': 5,
+  'eb': 6,
+  'e': 7,
+  'f': 8,
+  'f#': 9,
+  'gb': 9,
+  'g': 10,
+  'ab': 11,
 };
 export const NOTES: string[][] = [
   ['a', 'g##', 'bbb'],
@@ -94,4 +94,7 @@ export const MAX_TEMPO: number = 300;
 export const MIN_TEMPO: number = 20;
 export const MIN_RANGE: number = 21;
 export const MAX_RANGE: number = 128;
-export const MAX_INTERVAL: number = 8;
+export const MIN_SCALE_STEPS = 1
+export const MAX_SCALE_STEPS: number = 8;
+export const REPEATED_NOTE_PERCENTAGE: number = 0.05;
+export const TUNING_FREQUENCY = 440;

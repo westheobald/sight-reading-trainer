@@ -1,11 +1,9 @@
 import {
-  MAX_INTERVAL,
   MAX_RANGE,
   MAX_TEMPO,
   MIN_RANGE,
   MIN_TEMPO,
   RHYTHMS,
-  ROOT_NOTES,
   SCALES,
   TIME_SIGNATURES,
   TIME_SIG_SPLITS,
@@ -46,6 +44,7 @@ describe('Time Signature Testing', function timeSignatureTests() {
 describe('Scale Testing', function scaleTests() {
   test('Numeric Formula', function validNumericFormulas() {
     for (const scaleKey in SCALES) {
+      expect(SCALES[scaleKey].numericFormula[0]).toBe('1');
       let previousNum = 0;
       for (const el of SCALES[scaleKey].numericFormula) {
         const match = el.match(/^[#b]?(\d)$/);
@@ -58,7 +57,10 @@ describe('Scale Testing', function scaleTests() {
   });
   test('Intervallic Formula', function validIntervallicFormula() {
     for (const scaleKey in SCALES) {
-      const total = SCALES[scaleKey].intervallicFormula.reduce((acc, curr) => acc + curr);
+      const total = SCALES[scaleKey].intervallicFormula.reduce((acc, curr) => {
+        expect(curr).toBeGreaterThan(0);
+        return acc + curr;
+      });
       expect(total).toBe(12);
     }
   });
@@ -74,7 +76,7 @@ describe('Scale Testing', function scaleTests() {
 
 describe('Max/Min Constants', function maxMinConstantTests() {
   test('Ensure Integers', function maxMinIntergers() {
-    const tests = [MAX_RANGE, MIN_RANGE, MAX_TEMPO, MIN_TEMPO, MAX_INTERVAL];
+    const tests = [MAX_RANGE, MIN_RANGE, MAX_TEMPO, MIN_TEMPO];
     for (const num of tests) {
       expect(Number.isInteger(num)).toBeTruthy();
       expect(num).toBeGreaterThan(0);
