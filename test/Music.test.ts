@@ -11,7 +11,7 @@ import {
 
 const defaultOptions: MusicSettings = {
   rootNote: 'c',
-  scaleKey: 'major',
+  scaleKey: 'ionian',
   tempo: 120,
   timeSignature: [4, 4],
   range: [50, 80],
@@ -106,6 +106,28 @@ describe('Music Validation Functions', () => {
       expect(() => new Music(options)).toThrow();
     }
   });
+  test('Valid Scale Steps', () => {
+    const options = Object.assign({}, defaultOptions);
+    for (const scale in SCALES) {
+      options.scaleKey = scale;
+      for (let i = 1; i <= SCALES[scale].numericFormula.length; i++) {
+        options.maxScaleSteps = i;
+        const music = new Music(options);
+        expect(music.maxScaleSteps).toBe(i);
+      }
+    }
+  });
+  test('Invalid Scale Steps', () => {
+    const options = Object.assign({}, defaultOptions);
+    for (const scale in SCALES) {
+      options.scaleKey = scale;
+      const invalid = [0, SCALES[scale].numericFormula.length + 1];
+      for (const scaleSteps of invalid) {
+        options.maxScaleSteps = scaleSteps;
+        expect(() => new Music(options)).toThrow();
+      }
+    }
+  });
   test('Valid Range', () => {
     const options = Object.assign({}, defaultOptions);
     for (let i = MIN_RANGE; i <= MAX_RANGE - 12; i++) {
@@ -116,12 +138,10 @@ describe('Music Validation Functions', () => {
       }
     }
   });
-  /*test('Invalid Range', () => {
+  test('Invalid Range', () => {
     const options = Object.assign({}, defaultOptions);
     const invalid: [number, number][] = [
       [20, 50],
-      [21, 32],
-      [117, 128],
       [118, 129],
     ];
     for (const range of invalid) {
@@ -129,35 +149,12 @@ describe('Music Validation Functions', () => {
       expect(() => new Music(options)).toThrow();
     }
   });
-  test('Valid Interval Size', () => {
-    const options = Object.assign({}, defaultOptions);
-    for (const [scaleKey, scale] of Object.entries(SCALES)) {
-      options.scaleKey = scaleKey;
-      for (let i = scale.maxInterval; i <= MAX_INTERVAL; i++) {
-        options.intervalSize = i;
-        const music = new Music(options);
-        expect(music.intervalSize).toBe(i);
-      }
-    }
-  });
-  test('Invalid Interval Size', () => {
-    const options = Object.assign({}, defaultOptions);
-    for (const scaleKey of Object.keys(SCALES)) {
-      options.scaleKey = scaleKey;
-      options.intervalSize = 0;
-      expect(() => new Music(options)).toThrow();
-      for (let i = MAX_INTERVAL + 1; i < MAX_INTERVAL + 10; i++) {
-        options.intervalSize = i;
-        expect(() => new Music(options)).toThrow();
-      }
-    }
-  });*/
 });
 
 describe('getNotes Tests', () => {
   test('getNotes Major', () => {
     const options = Object.assign({}, defaultOptions);
-    options.scaleKey = 'major';
+    options.scaleKey = 'ionian';
     const testScales: [string, string[]][] = [
       ['c', ['c', 'd', 'e', 'f', 'g', 'a', 'b']],
       ['db', ['db', 'eb', 'f', 'gb', 'ab', 'bb', 'c']],
@@ -219,10 +216,5 @@ describe('getNotes Tests', () => {
   });
 });
 
-test('generateNotes', () => {
-  const options = Object.assign({}, defaultOptions);
-  options.maxScaleSteps = 2;
-  const music = new Music(options);
-  music.generateMelody(3);
-  console.log(music.melody);
-});
+//TODO: getRhythms tests
+//TODO: Generate notes test

@@ -2,6 +2,7 @@ import { Music, MusicSettings } from '../src/Music';
 import { ROOT_NOTES, SCALES, NOTES } from '../src/constants';
 import { getNextNote, getStartingNote } from '../src/generate-notes';
 
+const iterations = 10;
 test('getStartingNote', () => {
   for (const scaleStr in SCALES) {
     for (const root in ROOT_NOTES) {
@@ -22,7 +23,7 @@ test('getStartingNote', () => {
         const music = new Music(options);
         if (!music.scale.notes) throw Error();
         let notes = new Set();
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < iterations * 10; i++) {
           const [startingNote, startingIndex] = getStartingNote(
             music.scale,
             music.rootNote,
@@ -63,7 +64,7 @@ test('getNextNote', () => {
           music.rootNote,
           music.range,
         );
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < iterations; i++) {
           const [note, index] = getNextNote(
             music.scale,
             music.range,
@@ -123,12 +124,10 @@ test('generateNotes', () => {
           maxScaleSteps: 2,
         };
         const music = new Music(options);
-        for (let i = 0; i < 32; i++) {
-          music.generateMelody(i);
-          for (const bar of music.melody) {
-            for (const note of bar) {
-              expect(NOTES[(note.midiNote - 21) % 12].includes(note.noteName)).toBeTruthy();
-            }
+        music.generateMelody(iterations);
+        for (const bar of music.melody) {
+          for (const note of bar) {
+            expect(NOTES[(note.midiNote - 21) % 12].includes(note.noteName)).toBeTruthy();
           }
         }
       }

@@ -1,7 +1,6 @@
 import { Note } from './Note';
 import {
   MAX_RANGE,
-  MAX_SCALE_STEPS,
   MAX_TEMPO,
   MIN_RANGE,
   MIN_TEMPO,
@@ -90,16 +89,13 @@ export class Music {
       return maxScaleSteps;
     })(this.scale);
 
-    this.range = (function validateRange(scale, maxScaleSteps) {
+    this.range = (function validateRange() {
       const [minRange, maxRange] = range;
       if (minRange < MIN_RANGE || maxRange > MAX_RANGE || minRange > maxRange) {
         throw Error('Invalid range');
       }
-      if (maxScaleSteps * scale.maxInterval > Math.floor((maxRange - minRange + 1) / 2) * 12) {
-        throw Error('Invalid range (maxScaleSteps/range)');
-      }
       return range;
-    })(this.scale, this.maxScaleSteps);
+    })();
 
     this.scale.notes = (function getNotes(rootNote, scale) {
       const musicAlphabet = 'abcdefg';
@@ -118,6 +114,7 @@ export class Music {
         }
         noteIndex = (noteIndex + scale.intervallicFormula[i - 1]) % NOTES.length;
         notes[i] = NOTES[noteIndex].find((note) => note[0] == musicAlphabet[alphabetIndex]);
+        if (!notes[i]) notes[i] = NOTES[noteIndex][0]; //TODO: Bad fix for bb7, something else?
       }
       return notes;
     })(this.rootNote, this.scale);
